@@ -6,23 +6,33 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
-app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
-});
-
+// Define the database to store the shortURL-longURL key-value pairs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+// POST route handler to store the shortURL-longURL pair in the database
+app.post("/urls", (req, res) => {
+  const shortURL = generateRandomString(); // Generate a unique shortURL
+  const longURL = req.body.longURL; // Assuming the form field has the name "longURL"
+
+  // Store the shortURL-longURL pair in the urlDatabase
+  urlDatabase[shortURL] = longURL;
+
+  // Redirect to the show page for the newly created URL
+  res.redirect(`/urls/${shortURL}`);
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
 app.get("/urls/:id", (req, res) => {
-  const storedURL = "https://localhost:8080/urls"; // Replace with your actual long URL
-  const templateVars = { id: req.params.id, longURL: storedURL };
+  const id = req.params.id;
+  const longURL = urlDatabase[id]; // Retrieve the longURL from the urlDatabase
+
+  const templateVars = { id, longURL };
   res.render("urls_show", templateVars);
 });
 
@@ -47,7 +57,13 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
-
-
-function generateRandomString() {}
+// Helper function to generate a random alphanumeric string for the shortURL
+function generateRandomString() {
+  const length = 6;
+  let randomString = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < length; i++) {
+    randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return randomString;
+}
