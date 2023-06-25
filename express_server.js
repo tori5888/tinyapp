@@ -60,6 +60,15 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+// POST route handler for logout
+app.post("/logout", (req, res) => {
+  // Clear the username cookie
+  res.clearCookie("username");
+
+  // Redirect back to the /urls page
+  res.redirect("/urls");
+});
+
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: req.cookies["username"] // Pass the username to the template
