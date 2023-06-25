@@ -46,6 +46,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
+
 // POST route handler for login
 app.post("/login", (req, res) => {
   const username = req.body.username; // Get the username from the request body
@@ -71,6 +72,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
+
   res.render("urls_index", templateVars);
 });
 
