@@ -24,6 +24,18 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+// POST route handler to update the longURL of a URL resource
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id; // Get the URL ID from the request parameters
+  const newLongURL = req.body.longURL; // Get the updated longURL from the request body
+
+  // Update the longURL in the urlDatabase
+  urlDatabase[id] = newLongURL;
+
+  // Redirect to the show page for the updated URL
+  res.redirect(`/urls/${id}`);
+});
+
 app.post("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   if (urlDatabase[id]) {
