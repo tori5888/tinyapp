@@ -28,6 +28,9 @@
       <div class="navbar-nav ml-auto">
         <% if (username) { %>
           <span class="nav-item nav-link">Welcome, <%= username %></span>
+          <form class="form-inline" method="POST" action="/logout">
+            <button class="btn btn-light" type="submit">Logout</button>
+          </form>
         <% } else { %>
           <form class="form-inline" method="POST" action="/login">
             <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" required>
@@ -37,6 +40,7 @@
       </div>
     </nav>
   </header>
+
 </body>
 
 
