@@ -6,7 +6,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
-
 // Define the database to store the shortURL-longURL key-value pairs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -47,6 +46,17 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 });
 
+// POST route handler for login
+app.post("/login", (req, res) => {
+  const username = req.body.username; // Get the username from the request body
+
+  // Set the username as a cookie
+  res.cookie("username", username);
+
+  // Redirect back to the /urls page
+  res.redirect("/urls");
+});
+
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -75,7 +85,6 @@ app.get("/urls.json", (req, res) => {
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
