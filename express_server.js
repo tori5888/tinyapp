@@ -6,6 +6,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.set("view engine", "ejs");
 
+
 // Define the database to store the shortURL-longURL key-value pairs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
