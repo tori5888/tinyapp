@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,6 +22,16 @@ app.post("/urls", (req, res) => {
 
   // Redirect to the show page for the newly created URL
   res.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+  if (urlDatabase[id]) {
+    delete urlDatabase[id];
+    res.redirect("/urls");
+  } else {
+    res.status(404).send("URL not found");
+  }
 });
 
 app.get("/urls/new", (req, res) => {
@@ -60,8 +70,8 @@ app.listen(PORT, () => {
 // Helper function to generate a random alphanumeric string for the shortURL
 function generateRandomString() {
   const length = 6;
-  let randomString = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = "";
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (let i = 0; i < length; i++) {
     randomString += characters.charAt(Math.floor(Math.random() * characters.length));
   }
