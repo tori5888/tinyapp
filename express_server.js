@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8080;
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,25 +61,32 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"] // Pass the username to the template
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id]; // Retrieve the longURL from the urlDatabase
 
-  const templateVars = { id, longURL };
+  const templateVars = {
+    username: req.cookies["username"], // Pass the username to the template
+    id,
+    longURL
+  };
   res.render("urls_show", templateVars);
 });
 
+
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies["username"], // Pass the username to the template
+    urls: urlDatabase
+  };
 
   res.render("urls_index", templateVars);
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
 });
 
 app.get("/urls.json", (req, res) => {
