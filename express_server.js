@@ -168,8 +168,7 @@ app.post("/login", (req, res) => {
 });
 
 
-
-aapp.get("/login", (req, res) => {
+app.get("/login", (req, res) => {
   const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
 
   // Check if the user is already logged in
