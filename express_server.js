@@ -14,6 +14,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 // Helper function to generate a random alphanumeric string for the shortURL
 function generateRandomString() {
   const length = 6;
@@ -123,6 +136,41 @@ app.post("/login", (req, res) => {
   // Redirect back to the /urls page
   res.redirect("/urls");
 });
+
+// POST route handler for user registration
+app.post("/register", (req, res) => {
+  const { email, password } = req.body; // Get the email and password from the request body
+
+  // Check if the email or password is empty
+  if (!email || !password) {
+    res.status(400).send("Email and password are required");
+    return;
+  }
+
+  // Check if the email already exists in the users object
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      res.status(400).send("Email already registered");
+      return;
+    }
+  }
+
+  const userId = generateRandomString(); // Generate a unique user ID
+
+  // Create a new user object
+  const newUser = {
+    id: userId,
+    email,
+    password,
+  };
+
+  users[userId] = newUser; // Add the new user to the users object
+
+  res.cookie("user_id", userId); // Set the user_id cookie
+
+  res.redirect("/urls"); // Redirect to the /urls page
+});
+
 
 // POST route handler for logout   ---  and clear cookie
 app.post("/logout", (req, res) => {
