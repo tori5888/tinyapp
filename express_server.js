@@ -210,7 +210,7 @@ app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
 
   // Redirect back to the /urls page
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.listen(PORT, () => {
