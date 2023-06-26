@@ -27,6 +27,15 @@ const users = {
   },
 };
 
+function getUserByEmail(email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return null;
+}
+
 // Helper function to generate a random alphanumeric string for the shortURL
 function generateRandomString() {
   const length = 6;
@@ -141,6 +150,11 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
+  res.render("urls_login");
+});
+
+
 // POST route handler for user registration
 app.post("/register", (req, res) => {
   const { email, password } = req.body; // Get the email and password from the request body
@@ -152,11 +166,10 @@ app.post("/register", (req, res) => {
   }
 
   // Check if the email already exists in the users object
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      res.status(400).send("Email already registered");
-      return;
-    }
+  const existingUser = getUserByEmail(email);
+  if (existingUser) {
+    res.status(400).send("Email already registered");
+    return;
   }
 
   const userId = generateRandomString(); // Generate a unique user ID
