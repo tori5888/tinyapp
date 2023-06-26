@@ -66,15 +66,24 @@ app.get("/urls", (req, res) => {
 
 // POST route handler to store the shortURL-longURL pair in the database
 app.post("/urls", (req, res) => {
+  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+
+  // Check if the user is logged in
+  if (!user) {
+    res.status(401).send("You need to be logged in to shorten URLs");
+    return;
+  }
+
   const shortURL = generateRandomString(); // Generate a unique shortURL
   const longURL = req.body.longURL; // Assuming the form field has the name "longURL"
 
-  // Store the shortURL-longURL pair in the urlDatabase
+  // Store the shortURL-longURL pair in the urlDatabase only if the user is logged in
   urlDatabase[shortURL] = longURL;
 
   // Redirect to the show page for the newly created URL
   res.redirect(`/urls/${shortURL}`);
 });
+
 
 // get specific short URL
 app.get("/urls/:id", (req, res) => {
@@ -92,11 +101,20 @@ app.get("/urls/:id", (req, res) => {
 
 // create new url and longURL
 app.get("/urls/new", (req, res) => {
+  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+
+  // Check if the user is not logged in
+  if (!user) {
+    res.redirect("/urls_login"); // Redirect to /login if not logged in
+    return;
+  }
+
   const templateVars = {
-    user: users[req.cookies.user_id], // Pass the user object to the template
+    user: user // Pass the user object to the template
   };
   res.render("urls_new", templateVars);
 });
+
 
 
 // Updating long URL
@@ -168,6 +186,7 @@ app.post("/login", (req, res) => {
 });
 
 
+// login route
 app.get("/login", (req, res) => {
   const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
 
