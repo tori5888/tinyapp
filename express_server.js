@@ -132,10 +132,14 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // get register page
 app.get("/register", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]] // Pass the user object to the template
-  };
-  res.render("url_register", templateVars);
+  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+
+  // Check if the user is already logged in
+  if (user) {
+    res.redirect("/urls"); // Redirect to /urls if logged in
+  } else {
+    res.render("url_register"); // Render the registration page if not logged in
+  }
 });
 
 
@@ -165,8 +169,15 @@ app.post("/login", (req, res) => {
 
 
 
-app.get("/login", (req, res) => {
-  res.render("urls_login");
+aapp.get("/login", (req, res) => {
+  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+
+  // Check if the user is already logged in
+  if (user) {
+    res.redirect("/urls"); // Redirect to /urls if logged in
+  } else {
+    res.render("urls_login"); // Render the login page if not logged in
+  }
 });
 
 
