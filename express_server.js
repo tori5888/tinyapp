@@ -10,9 +10,25 @@ app.set("view engine", "ejs");
 
 // Define the database to store the shortURL-longURL key-value pairs
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "123456": {
+    userId: "someID",
+    longUrl: "https://www.example.com"
+  },
+  "789012": {
+    userId: "anotherID",
+    longUrl: "https://www.example.org"
+  }
 };
+
+function urlsForUser(id) {
+  const userUrls = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userId === id) {
+      userUrls[shortURL] = urlDatabase[shortURL];
+    }
+  }
+  return userUrls;
+}
 
 const users = {
   userRandomID: {
@@ -47,17 +63,29 @@ function generateRandomString() {
   return randomString;
 }
 
-  /*
-      ======================================================
-                        R O U T E S
-      ======================================================
-  */
+/*
+    ======================================================
+                      R O U T E S
+    ======================================================
+*/
+
 
 // get all URLS
 app.get("/urls", (req, res) => {
+  const user = users[req.cookies.user_id];
+
+  // Check if the user is logged in
+  if (!user) {
+    res.redirect("/login"); // Redirect to the login page
+    return;
+  }
+
+  const userUrls = urlsForUser(user.id);
+  console.log(user.id,userUrls);
+
   const templateVars = {
-    user: users[req.cookies.user_id], // Pass the user object to the template
-    urls: urlDatabase
+    user: user,
+    urls: userUrls
   };
 
   res.render("urls_index", templateVars);
@@ -78,12 +106,37 @@ app.post("/urls", (req, res) => {
   const longURL = req.body.longURL; // Assuming the form field has the name "longURL"
 
   // Store the shortURL-longURL pair in the urlDatabase only if the user is logged in
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = {
+    longURL: longURL,
+    userId: req.cookies.user_id
+  };
+
+  // "123456": {
+  //   userId: "someID",
+  //   longUrl: "https://www.example.com"
+  // },
 
   // Redirect to the show page for the newly created URL
   res.redirect(`/urls/${shortURL}`);
 });
 
+
+// create new url and longURL
+app.get("/urls/new", (req, res) => {
+  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+
+
+  // Check if the user is not logged in
+  if (!user) {
+    res.redirect("/login"); // Redirect to /login if not logged in
+    return;
+  }
+
+  const templateVars = {
+    user: user // Pass the user object to the template
+  };
+  res.render("urls_new", templateVars);
+});
 
 // get specific short URL
 app.get("/urls/:id", (req, res) => {
@@ -98,22 +151,6 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
-// create new url and longURL
-app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
-
-  // Check if the user is not logged in
-  if (!user) {
-    res.redirect("/urls_login"); // Redirect to /login if not logged in
-    return;
-  }
-
-  const templateVars = {
-    user: user // Pass the user object to the template
-  };
-  res.render("urls_new", templateVars);
-});
 
 
 
@@ -131,11 +168,11 @@ app.post("/urls/:id", (req, res) => {
 
 // go to longURL website/page
 app.get('/u/:id', (req, res) => {
-//get website from the specificid
-  const longURLWebsite = urlDatabase[req.params.id]
-//redirect to that longURL
-  res.redirect(longURLWebsite)
-})
+  //get website from the specificid
+  const longURLWebsite = urlDatabase[req.params.id];
+  //redirect to that longURL
+  res.redirect(longURLWebsite);
+});
 
 // deleting url
 app.post("/urls/:id/delete", (req, res) => {
@@ -242,6 +279,8 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+
+//app listen
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
