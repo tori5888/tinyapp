@@ -153,14 +153,16 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email);
 
   // Check if the user exists and the password matches
-  if (user && user.password === password) {
-    // Set the user_id as a cookie
-    res.cookie("user_id", user.id);
-    res.redirect("/urls");
-  } else {
-    res.status(401).send("Invalid email or password");
+  if (!user || user.password !== password) {
+    res.status(403).send("Invalid email or password");
+    return;
   }
+
+  // Set the user_id as a cookie
+  res.cookie("user_id", user.id);
+  res.redirect("/urls");
 });
+
 
 
 app.get("/login", (req, res) => {
