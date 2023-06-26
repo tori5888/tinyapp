@@ -141,14 +141,27 @@ app.get("/register", (req, res) => {
 
 // POST route handler for login
 app.post("/login", (req, res) => {
-  const username = req.body.username; // Get the username from the request body
+  const { email, password } = req.body; // Get the email and password from the request body
 
-  // Set the username as a cookie
-  res.cookie("username", username);
+  // Check if the email or password is empty
+  if (!email || !password) {
+    res.status(400).send("Email and password are required");
+    return;
+  }
 
-  // Redirect back to the /urls page
-  res.redirect("/urls");
+  // Find the user by email
+  const user = getUserByEmail(email);
+
+  // Check if the user exists and the password matches
+  if (user && user.password === password) {
+    // Set the user_id as a cookie
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else {
+    res.status(401).send("Invalid email or password");
+  }
 });
+
 
 app.get("/login", (req, res) => {
   res.render("urls_login");
