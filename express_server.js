@@ -47,12 +47,13 @@ function generateRandomString() {
 // get all URLS
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"], // Pass the username to the template
+    user: users[req.cookies.user_id], // Pass the user object to the template
     urls: urlDatabase
   };
 
   res.render("urls_index", templateVars);
 });
+
 
 // POST route handler to store the shortURL-longURL pair in the database
 app.post("/urls", (req, res) => {
@@ -69,23 +70,25 @@ app.post("/urls", (req, res) => {
 // get specific short URL
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  const longURL = urlDatabase[id]; // Retrieve the longURL from the urlDatabase
+  const longURL = urlDatabase[id];
 
   const templateVars = {
-    username: req.cookies["username"], // Pass the username to the template
+    user: users[req.cookies.user_id], // Pass the user object to the template
     id,
     longURL
   };
   res.render("urls_show", templateVars);
 });
 
+
 // create new url and longURL
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"] // Pass the username to the template
+    user: users[req.cookies.user_id], // Pass the user object to the template
   };
   res.render("urls_new", templateVars);
 });
+
 
 // Updating long URL
 app.post("/urls/:id", (req, res) => {
@@ -120,11 +123,12 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // get register page
 app.get("/register", (req, res) => {
-   const templateVars = {
-    username: req.cookies["username"]
+  const templateVars = {
+    user: users[req.cookies["user_id"]] // Pass the user object to the template
   };
   res.render("url_register", templateVars);
 });
+
 
 // POST route handler for login
 app.post("/login", (req, res) => {
@@ -172,10 +176,10 @@ app.post("/register", (req, res) => {
 });
 
 
-// POST route handler for logout   ---  and clear cookie
+// POST route handler for logout and clear cookie
 app.post("/logout", (req, res) => {
-  // Clear the username cookie
-  res.clearCookie("username");
+  // Clear the user_id cookie
+  res.clearCookie("user_id");
 
   // Redirect back to the /urls page
   res.redirect("/urls");

@@ -12,8 +12,8 @@
       </div>
     </div>
     <div class="navbar-nav ml-auto">
-      <% if (username) { %>
-        <span class="nav-item nav-link">Welcome, <%= username %></span>
+      <% if (user) { %>
+        <span class="nav-item nav-link">Welcome, <%= user.email %></span>
         <form class="form-inline" method="POST" action="/logout">
           <button class="btn btn-light" type="submit">Logout</button>
         </form>
