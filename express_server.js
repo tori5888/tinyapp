@@ -4,6 +4,8 @@ const PORT = 8080;
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
+const { getUserByEmail } = require('./helpers');
+
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -51,14 +53,14 @@ const users = {
   },
 };
 
-function getUserByEmail(email) {
-  for (const userId in users) {
-    if (users[userId].email === email) {
-      return users[userId];
-    }
-  }
-  return null;
-}
+// function getUserByEmail(email) {
+//   for (const userId in users) {
+//     if (users[userId].email === email) {
+//       return users[userId];
+//     }
+//   }
+//   return null;
+// }
 
 // Helper function to generate a random alphanumeric string for the shortURL
 function generateRandomString() {
@@ -215,7 +217,7 @@ app.post("/login", (req, res) => {
   }
 
   // Find the user by email
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
 
   // Check if the user exists and the password matches
   if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -255,7 +257,7 @@ app.post("/register", (req, res) => {
   }
 
   // Check if the email already exists in the users object
-  const existingUser = getUserByEmail(email);
+  const existingUser = getUserByEmail(email, users);
   if (existingUser) {
     res.status(400).send("Email already registered");
     return;
