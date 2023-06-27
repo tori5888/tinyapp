@@ -2,10 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const cookieParser = require("cookie-parser");
+const bcrypt = require("bcryptjs");
+
 app.use(cookieParser());
-
 app.use(express.urlencoded({ extended: true }));
-
 app.set("view engine", "ejs");
 
 // Define the database to store the shortURL-longURL key-value pairs
@@ -211,10 +211,11 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email);
 
   // Check if the user exists and the password matches
-  if (!user || user.password !== password) {
+  if (!user || !bcrypt.compareSync(password, user.password)) {
     res.status(403).send("Invalid email or password");
     return;
   }
+  console.log(user.password)
 
   // Set the user_id as a cookie
   res.cookie("user_id", user.id);
@@ -253,12 +254,13 @@ app.post("/register", (req, res) => {
   }
 
   const userId = generateRandomString(); // Generate a unique user ID
+  const hashedPassword = bcrypt.hashSync(password, 10); // Hash the password using bcrypt
 
-  // Create a new user object
+  // Create a new user object with the hashed password
   const newUser = {
     id: userId,
     email,
-    password,
+    password: hashedPassword, // Save the hashed password
   };
 
   users[userId] = newUser; // Add the new user to the users object
@@ -267,6 +269,7 @@ app.post("/register", (req, res) => {
 
   res.redirect("/urls"); // Redirect to the /urls page
 });
+
 
 
 // POST route handler for logout and clear cookie
