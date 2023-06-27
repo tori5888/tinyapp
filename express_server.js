@@ -81,7 +81,6 @@ app.get("/urls", (req, res) => {
   }
 
   const userUrls = urlsForUser(user.id);
-  console.log(user.id,userUrls);
 
   const templateVars = {
     user: user,
