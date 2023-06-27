@@ -3,10 +3,18 @@ const app = express();
 const PORT = 8080;
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
+const cookieSession = require('cookie-session');
 
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
+
+app.use(cookieSession({
+  name: 'session',
+  secret: 'some-secret-key',
+  keys: ['some-secret-key'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 // Define the database to store the shortURL-longURL key-value pairs
 const urlDatabase = {
@@ -72,7 +80,7 @@ function generateRandomString() {
 
 // get all URLS
 app.get("/urls", (req, res) => {
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
 
   // Check if the user is logged in
   if (!user) {
@@ -93,7 +101,7 @@ app.get("/urls", (req, res) => {
 
 // POST route handler to store the shortURL-longURL pair in the database
 app.post("/urls", (req, res) => {
-  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+  const user = users[req.session.user_id]; // Replace with req.session.user_id
 
   // Check if the user is logged in
   if (!user) {
@@ -107,7 +115,7 @@ app.post("/urls", (req, res) => {
   // Store the shortURL-longURL pair in the urlDatabase only if the user is logged in
   urlDatabase[shortURL] = {
     longURL: longURL,
-    userId: req.cookies.user_id
+    userId: req.session.user_id
   };
 
   // "123456": {
@@ -122,8 +130,7 @@ app.post("/urls", (req, res) => {
 
 // create new url and longURL
 app.get("/urls/new", (req, res) => {
-  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
-
+  const user = users[req.session.user_id];
 
   // Check if the user is not logged in
   if (!user) {
@@ -143,7 +150,7 @@ app.get("/urls/:id", (req, res) => {
   const longURL = urlDatabase[id];
 
   const templateVars = {
-    user: users[req.cookies.user_id], // Pass the user object to the template
+    user: users[req.session.user_id], // Pass the user object to the template
     id,
     longURL
   };
@@ -159,7 +166,7 @@ app.post("/urls/:id", (req, res) => {
   const newLongURL = req.body.longURL; // Get the updated longURL from the request body
 
   // Update the longURL in the urlDatabase
-  urlDatabase[id] = newLongURL;
+  urlDatabase[id].longURL = newLongURL;
 
   // Redirect to the show page for the updated URL
   res.redirect(`/urls/${id}`);
@@ -186,7 +193,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // get register page
 app.get("/register", (req, res) => {
-  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+  const user = users[req.session.user_id]; // Replace with req.session.user_id
 
   // Check if the user is already logged in
   if (user) {
@@ -215,17 +222,18 @@ app.post("/login", (req, res) => {
     res.status(403).send("Invalid email or password");
     return;
   }
-  console.log(user.password)
 
-  // Set the user_id as a cookie
-  res.cookie("user_id", user.id);
+  // Set the user_id on the session
+  req.session.user_id = user.id;
+
   res.redirect("/urls");
 });
 
 
+
 // login route
 app.get("/login", (req, res) => {
-  const user = users[req.cookies.user_id]; // Get the user object using the user_id cookie
+  const user = users[req.session.user_id]; // Replace with req.session.user_id
 
   // Check if the user is already logged in
   if (user) {
@@ -265,21 +273,23 @@ app.post("/register", (req, res) => {
 
   users[userId] = newUser; // Add the new user to the users object
 
-  res.cookie("user_id", userId); // Set the user_id cookie
+  // Set the user_id on the session
+  req.session.user_id = userId;
 
   res.redirect("/urls"); // Redirect to the /urls page
 });
 
 
-
 // POST route handler for logout and clear cookie
 app.post("/logout", (req, res) => {
-  // Clear the user_id cookie
-  res.clearCookie("user_id");
+  // Clear the user_id on the session
+  req.session = null;
 
-  // Redirect back to the /urls page
+
+  // Redirect back to the /login page
   res.redirect("/login");
 });
+
 
 
 //app listen
