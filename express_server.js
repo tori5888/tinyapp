@@ -4,7 +4,7 @@ const PORT = 8080;
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require('./helpers');
+const { urlsForUser, generateRandomString, getUserByEmail } = require('./helpers');
 
 
 app.use(cookieParser());
@@ -30,15 +30,6 @@ const urlDatabase = {
   }
 };
 
-function urlsForUser(id) {
-  const userUrls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userId === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userUrls;
-}
 
 const users = {
   userRandomID: {
@@ -53,25 +44,6 @@ const users = {
   },
 };
 
-// function getUserByEmail(email) {
-//   for (const userId in users) {
-//     if (users[userId].email === email) {
-//       return users[userId];
-//     }
-//   }
-//   return null;
-// }
-
-// Helper function to generate a random alphanumeric string for the shortURL
-function generateRandomString() {
-  const length = 6;
-  let randomString = "";
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < length; i++) {
-    randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return randomString;
-}
 
 /*
     ======================================================
@@ -90,7 +62,7 @@ app.get("/urls", (req, res) => {
     return;
   }
 
-  const userUrls = urlsForUser(user.id);
+const userUrls = urlsForUser(req.session.user_id, urlDatabase);
 
   const templateVars = {
     user: user,
@@ -119,11 +91,6 @@ app.post("/urls", (req, res) => {
     longURL: longURL,
     userId: req.session.user_id
   };
-
-  // "123456": {
-  //   userId: "someID",
-  //   longUrl: "https://www.example.com"
-  // },
 
   // Redirect to the show page for the newly created URL
   res.redirect(`/urls/${shortURL}`);
@@ -158,8 +125,6 @@ app.get("/urls/:id", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
-
-
 
 
 // Updating long URL
@@ -232,7 +197,6 @@ app.post("/login", (req, res) => {
 });
 
 
-
 // login route
 app.get("/login", (req, res) => {
   const user = users[req.session.user_id]; // Replace with req.session.user_id
@@ -291,7 +255,6 @@ app.post("/logout", (req, res) => {
   // Redirect back to the /login page
   res.redirect("/login");
 });
-
 
 
 //app listen
