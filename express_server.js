@@ -94,6 +94,10 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
+// redirect root URL to "/urls"
+app.get('/', (req, res) => {
+  res.redirect('/urls');
+});
 
 // create new url and longURL
 app.get("/urls/new", (req, res) => {
