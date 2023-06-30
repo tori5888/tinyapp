@@ -1,5 +1,4 @@
-//
-
+// function to get a user by email from the users object
 function getUserByEmail(email, users) {
   for (const userId in users) {
     if (users[userId].email === email) {
@@ -9,8 +8,8 @@ function getUserByEmail(email, users) {
   return null;
 }
 
-//
-function urlsForUser(id,urlDatabase) {
+// function to get the URLs associated with a specific user
+function urlsForUser(id, urlDatabase) {
   const userUrls = {};
   for (const shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userId === id) {
@@ -20,7 +19,7 @@ function urlsForUser(id,urlDatabase) {
   return userUrls;
 }
 
-// Helper function to generate a random alphanumeric string for the shortURL
+// helper function to generate a random alphanumeric string for the shortURL
 function generateRandomString() {
   const length = 6;
   let randomString = "";
@@ -31,6 +30,8 @@ function generateRandomString() {
   return randomString;
 }
 
-
-module.exports = { urlsForUser, generateRandomString, getUserByEmail };
-
+module.exports = {
+  urlsForUser,
+  generateRandomString,
+  getUserByEmail
+};
