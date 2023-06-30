@@ -134,7 +134,7 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[id].longURL = newLongURL;
 
   // Redirect to the show page for the updated URL
-  res.redirect(`/urls/${id}`);
+  res.redirect("/urls");
 });
 
 // go to longURL website/page
