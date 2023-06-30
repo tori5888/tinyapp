@@ -26,11 +26,12 @@
         <form method="POST" action="/urls/<%= id %>">
           <div class="form-group">
             <label for="longURL">Updated Long URL:</label>
-            <input type="text" class="form-control" id="longURL" name="longURL" placeholder="Enter the updated long URL" required>
+            <input type="text" class="form-control" id="longURL" name="longURL" placeholder="Enter the updated long URL" required value="<%= longURL.longURL %>">
           </div>
           <button type="submit" class="btn btn-primary">Update</button>
         </form>
       </div>
+
     </div>
 
     <!-- Bootstrap JS -->

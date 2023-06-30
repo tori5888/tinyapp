@@ -125,8 +125,13 @@ app.get("/urls/:id", (req, res) => {
     id,
     longURL
   };
+
+  // Set the value of the input field to the current longURL
+  templateVars.currentURL = longURL.longURL;
+
   res.render("urls_show", templateVars);
 });
+
 
 
 // Updating long URL
@@ -143,11 +148,18 @@ app.post("/urls/:id", (req, res) => {
 
 // go to longURL website/page
 app.get('/u/:id', (req, res) => {
-  //get website from the specificid
-  const longURLWebsite = urlDatabase[req.params.id];
-  //redirect to that longURL
-  res.redirect(longURLWebsite);
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+
+  if (longURL) {
+    // Redirect to the longURL
+    res.redirect(longURL.longURL);
+  } else {
+    // Handle the case when the URL is not found
+    res.status(404).send("URL not found");
+  }
 });
+
 
 // deleting url
 app.post("/urls/:id/delete", (req, res) => {
