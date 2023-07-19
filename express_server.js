@@ -115,15 +115,30 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+
+// Middleware function to check if the user is logged in
+function checkLoggedIn(req, res, next) {
+  if (!req.session.user_id) {
+    // If the user is not logged in, send a 401 Unauthorized status with an error message
+    return res.status(401).send("<h1>401 Unauthorized</h1><p>Please log in to view this page.</p>");
+  }
+  // If the user is logged in, proceed to the next middleware or route handler
+  next();
+}
+
 // get specific short URL
-// if has not been set sent back 401 for unauthorized and error msg
-app.get("/urls/:id", (req, res) => {
-  
+app.get("/urls/:id", checkLoggedIn, (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
 
+  // Check if the URL ID exists in the database
+  if (!longURL) {
+    // If the ID doesn't exist, send a 404 Not Found status with an error message
+    return res.status(404).send("<h1>404 Not Found</h1><p>The specified short URL does not exist or you are not logged in</p>");
+  }
+
   const templateVars = {
-    user: users[req.session.user_id], // Pass the user object to the template
+    user: users[req.session.user_id],
     id,
     longURL
   };
@@ -134,33 +149,21 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
-
 // Updating long URL
-app.post("/urls/:id", (req, res) => {
-  const id = req.params.id; // Get the URL ID from the request parameters
-  const newLongURL = req.body.longURL; // Get the updated longURL from the request body
+app.post("/urls/:id", checkLoggedIn, (req, res) => {
+  const id = req.params.id;
+  const newLongURL = req.body.longURL;
 
-  // Update the longURL in the urlDatabase
+  // Check if the URL ID exists in the database
+  if (!urlDatabase[id]) {
+    // If the ID doesn't exist, send a 404 Not Found status with an error message
+    return res.status(404).send("<h1>404 Not Found</h1><p>The specified short URL does not exist.</p>");
+  }
+
   urlDatabase[id].longURL = newLongURL;
-
-  // Redirect to the show page for the updated URL
   res.redirect("/urls");
 });
 
-// go to longURL website/page
-app.get('/u/:id', (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id];
-
-  if (longURL) {
-    // Redirect to the longURL
-    res.redirect(longURL.longURL);
-  } else {
-    // Handle the case when the URL is not found
-    res.status(404).send("URL not found");
-  }
-});
 
 
 // deleting url
