@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080;
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-const { urlsForUser, generateRandomString, getUserByEmail } = require('./helpers');
+const { urlsForUser, checkLoggedIn, generateRandomString, getUserByEmail } = require('./helpers');
 
 
 app.use(express.urlencoded({ extended: true }));
@@ -115,16 +115,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-
-// Middleware function to check if the user is logged in
-function checkLoggedIn(req, res, next) {
-  if (!req.session.user_id) {
-    // If the user is not logged in, send a 401 Unauthorized status with an error message
-    return res.status(401).send("<h1>401 Unauthorized</h1><p>Please log in to view this page.</p>");
-  }
-  // If the user is logged in, proceed to the next middleware or route handler
-  next();
-}
 
 // get specific short URL
 app.get("/urls/:id", checkLoggedIn, (req, res) => {
