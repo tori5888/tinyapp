@@ -116,7 +116,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 // get specific short URL
+// if has not been set sent back 401 for unauthorized and error msg
 app.get("/urls/:id", (req, res) => {
+  
   const id = req.params.id;
   const longURL = urlDatabase[id];
 
